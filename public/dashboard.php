@@ -12,9 +12,11 @@
             <h1>Tracker</h1>
             <h2>Bonjour, <?php echo htmlspecialchars($_SESSION['username']); ?></h2>
         </div>
-        <div class="settingsButton">
-            <a href="settings.php" class="settingsLink">Settings</a>
-        </div>
+        <a href="settings.php" class="settingsLink">
+            <div class="settingsButton">
+                Settings
+            </div>
+        </a>
     </header>
     <div class="summary">
         <h2>Summary</h2>
