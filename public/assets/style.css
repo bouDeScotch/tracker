@@ -70,6 +70,71 @@ header a.settingsLink {
     color: inherit;
 } 
 
+.summary {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.cardsList {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    flex-direction: column;
+    list-style: none;
+    padding: 20px;
+    margin: 0;
+    width: 100%;
+    border: solid 1px var(--textColor);
+    border-radius: 12px;
+    box-sizing: border-box;
+    background-color: var(--darkerColor);
+    gap: 20px;
+}
+
+.summary .cardsList li::marker {
+    display: none;
+}
+
+.summary .cardsList li {
+    background-color: var(--bgColor);
+    color: var(--textColor);
+    padding: 10px;
+    border-radius: 8px;
+    width: 100%;
+    box-sizing: border-box;
+    border: solid 1px var(--lighterColor);
+}
+
+.summary .cardsList li .progressBar {
+    background-color: var(--darkerColor);
+    height: 4px;
+    width: 100%;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.summary .cardsList li .progressBar::before {
+    position: absolute;
+    content: '';
+    height: 100%;
+    left: 0;
+    top: 0;
+    width: 0%;
+    transition: width 0.5s ease;
+}
+
+.summary .cardsList li .progressBar.notFull::before {
+    background-color: var(--positiveFill);
+}
+
+.summary .cardsList li .progressBar.full::before {
+    background-color: var(--negativeFill);
+}
+
 #weightChart {
     max-width: 600px;
     margin: 0 auto;

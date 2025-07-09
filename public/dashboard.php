@@ -33,7 +33,7 @@
                 <div class="progressBar notFull" data-progress="81.52"></div>
             </li>
             <li class="card single">
-                <h3>Protein : 150 / 120 g</h3>
+                <h3>Protein : 150 / 120 g (+ 30 g)</h3>
                 <div class="progressBar full" data-progress="125"></div>
             </li>
             <li class="card array">
@@ -103,6 +103,8 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Chart.js script -->
     <script>
     const ctx = document.getElementById('weightChart').getContext('2d');
 
@@ -157,6 +159,29 @@
     });
 
 
+    </script>
+
+    <!-- Progress bars script -->
+    <script>
+        document.querySelectorAll('.progressBar').forEach(bar => {
+            const progress = parseFloat(bar.dataset.progress);
+            const clampedProgress = Math.min(progress, 100);
+            bar.querySelector("::before");
+            bar.style.setProperty('--progress', `${clampedProgress}%`);
+            bar.classList.toggle('full', clampedProgress === 100);
+            bar.classList.toggle('notFull', clampedProgress < 100);
+            bar.style.position = 'relative';
+            const inner = document.createElement('div');
+            inner.style.position = 'absolute';
+            inner.style.height = '100%';
+            inner.style.left = '0';
+            inner.style.top = '0';
+            inner.style.backgroundColor = clampedProgress === 100 ? 'var(--negativeFill)' : 'var(--positiveFill)';
+            inner.style.transition = 'width 0.3s ease';
+            inner.style.borderRadius = 'inherit';
+            bar.appendChild(inner);
+            inner.style.width = clampedProgress + "%";
+        });
     </script>
 </body>
 </html>
