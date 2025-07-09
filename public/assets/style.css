@@ -29,6 +29,7 @@ header {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    align-items: center;
 }
 
 header h1 {
@@ -39,8 +40,19 @@ header h1 {
 
 header h2 {
     margin: 0;
-    font-size: 1.5em;
+    font-size: 1.2em;
     color: var(--lighterColor);
+}
+
+header h2 .username {
+    color: var(--lighterColor);
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+header h2 .username:hover {
+    color: var(--textColor);
+    transition: color 0.3s ease;
 }
 
 header .settingsButton {
