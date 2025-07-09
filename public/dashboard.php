@@ -10,7 +10,14 @@
     <header>
         <div class="texts">
             <h1>Tracker</h1>
-            <h2>Bonjour, <?php echo htmlspecialchars($_SESSION['username']); ?></h2>
+            <h2>Bonjour, <span class="username">
+                <?php
+                session_name('tracker_session');
+                session_start();
+                $_SESSION['username'] = 'John Doe'; // Example username, replace with actual session data
+                echo htmlspecialchars($_SESSION['username']); 
+                ?>
+            </span></h2>
         </div>
         <a href="settings.php" class="settingsLink">
             <div class="settingsButton">
@@ -132,7 +139,8 @@
                     },
                     ticks: {
                         display: false
-                    }
+                    },
+                    display: false
                 },
                 x: {
                     grid: {
@@ -140,7 +148,8 @@
                     },
                     ticks: {
                         display: false
-                    }
+                    },
+                    display: false
                 }
             }
         }
