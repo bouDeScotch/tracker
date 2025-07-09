@@ -1,0 +1,9 @@
+RewriteEngine On
+RewriteBase /tracker/
+
+# Redirige /tracker/XXX vers /tracker/public/XXX.php si le fichier existe
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_URI} ^/tracker/([^/]+)/?$
+RewriteCond %{DOCUMENT_ROOT}/tracker/public/%1.php -f
+RewriteRule ^([^/]+)/?$ public/$1.php [L]
