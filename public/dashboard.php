@@ -166,7 +166,6 @@
         document.querySelectorAll('.progressBar').forEach(bar => {
             const progress = parseFloat(bar.dataset.progress);
             const clampedProgress = Math.min(progress, 100);
-            bar.querySelector("::before");
             bar.style.setProperty('--progress', `${clampedProgress}%`);
             bar.classList.toggle('full', clampedProgress === 100);
             bar.classList.toggle('notFull', clampedProgress < 100);

@@ -95,11 +95,11 @@ header a.settingsLink {
     gap: 20px;
 }
 
-.summary .cardsList li::marker {
+.summary .cardsList .card.single::marker {
     display: none;
 }
 
-.summary .cardsList li {
+.summary .cardsList .card {
     background-color: var(--bgColor);
     color: var(--textColor);
     padding: 10px;
@@ -109,30 +109,12 @@ header a.settingsLink {
     border: solid 1px var(--lighterColor);
 }
 
-.summary .cardsList li .progressBar {
+.summary .cardsList .card.single .progressBar {
     background-color: var(--darkerColor);
     height: 4px;
     width: 100%;
     border-radius: 2px;
     overflow: hidden;
-}
-
-.summary .cardsList li .progressBar::before {
-    position: absolute;
-    content: '';
-    height: 100%;
-    left: 0;
-    top: 0;
-    width: 0%;
-    transition: width 0.5s ease;
-}
-
-.summary .cardsList li .progressBar.notFull::before {
-    background-color: var(--positiveFill);
-}
-
-.summary .cardsList li .progressBar.full::before {
-    background-color: var(--negativeFill);
 }
 
 #weightChart {
