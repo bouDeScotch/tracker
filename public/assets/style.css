@@ -30,6 +30,8 @@ header {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+
+    z-index: 1000; /* Progress bar where going above the header */
 }
 
 header h1 {
@@ -70,7 +72,7 @@ header a.settingsLink {
     color: inherit;
 } 
 
-.summary {
+.summary, .actionsHistory {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -79,7 +81,7 @@ header a.settingsLink {
     box-sizing: border-box;
 }
 
-.cardsList {
+.cardsList, .actionsList {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -88,19 +90,17 @@ header a.settingsLink {
     padding: 20px;
     margin: 0;
     width: 100%;
-    border: solid 1px var(--textColor);
     border-radius: 12px;
     box-sizing: border-box;
-    background-color: var(--darkerColor);
     gap: 20px;
 }
 
-.summary .cardsList .card.single::marker {
+.card.single::marker, .actionCard::marker {
     display: none;
 }
 
-.summary .cardsList .card {
-    background-color: var(--bgColor);
+.card, .actionCard {
+    background-color: var(--darkerColor);
     color: var(--textColor);
     padding: 10px;
     border-radius: 8px;
@@ -109,8 +109,8 @@ header a.settingsLink {
     border: solid 1px var(--lighterColor);
 }
 
-.summary .cardsList .card.single .progressBar {
-    background-color: var(--darkerColor);
+.progressBar {
+    background-color: var(--bgColor);
     height: 4px;
     width: 100%;
     border-radius: 2px;
@@ -118,6 +118,30 @@ header a.settingsLink {
 }
 
 #weightChart {
-    max-width: 600px;
+    max-height: 20vh;
     margin: 0 auto;
+    border-radius: 8px;
+    border: solid 1px var(--lighterColor);
+}
+
+.actionCard {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.actionCard .texts {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.actionType {
+    font-size: 1.2em;   
+}
+
+.date {
+    font-size: 0.9em;
+    color: var(--lighterColor);
 }
