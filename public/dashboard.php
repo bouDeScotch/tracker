@@ -94,13 +94,13 @@
 
     <div class="buttons">
         <div class="roundButton addButton"></div>
-        <a href="">
+        <a href="/tracker/public/meals.php">
             <div class="roundButton mealButton"></div>
         </a>
-        <a href="">
+        <a href="/tracker/public/workouts.php">
             <div class="roundButton workoutButton"></div>
         </a>
-        <a href="">
+        <a href="/tracker/public/weight.php">
             <div class="roundButton weightButton"></div>
         </a>
     </div>
