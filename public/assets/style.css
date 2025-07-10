@@ -6,6 +6,10 @@
     --textColor: #FFF;
     --lighterColor: rgba(255, 255, 255, 0.5);
     --mainFont: 'Arial', sans-serif;
+
+    --buttonsSize: min(20vw, 20vh);
+    --45degUnit: calc(sqrt(2) / 2);
+    --distButtons: calc(var(--buttonsSize) * 1.3066) /* 1/sqrt(2 - sqrt(2)), so that buttons barely touch */;
 }
 
 body {
@@ -13,6 +17,7 @@ body {
     color: var(--textColor);
     font-family: var(--mainFont);
     padding-top: 12.5vh; /* Space for fixed header */
+    padding-bottom: calc(3vh + var(--buttonsSize)); /* Space for buttons */
     margin: 0;
 }
 
@@ -163,4 +168,73 @@ header a.settingsLink {
 .deleteButton {
     background-image: url('./images/binIcon.png');
     aspect-ratio: 1 / 1;
+}
+
+.buttons {
+    position: fixed;
+    bottom: 3vh;
+    left: 50%;
+    z-index: 1000; /* Ensure buttons are above other content */
+}
+
+.roundButton {
+    width: var(--buttonsSize);
+    aspect-ratio: 1 / 1;
+    border-radius: 50%;
+    background-color: var(--positiveFill);
+    background-size: 60%;
+    background-repeat: no-repeat;
+    background-position: center;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+
+    position: absolute;
+    bottom: 0;
+    left: calc(50% - var(--buttonsSize) / 2);
+    margin: auto;
+    opacity: 1;
+    pointer-events: none;
+    transform: translate(0, 0);
+    transition: transform 0.3s ease;
+}
+
+.mealButton {
+    background-image: url('./images/mealIcon.png');
+}
+
+.workoutButton {
+    background-image: url('./images/workoutIcon.png');
+}
+
+.weightButton {
+    background-image: url('./images/weightIcon.png');
+}
+
+.roundButton.addButton {
+    opacity: 1;
+    pointer-events: auto;
+    z-index: 2; /* Ensure add button is above other buttons */
+    background-image: url('./images/crossIcon.png');
+}
+
+.addButton.clicked {
+    background-color: var(--negativeFill);
+    transform: rotate(45deg);
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.buttons .mealButton.clicked {
+    transform: translate(calc(-1 * var(--45degUnit) * var(--distButtons)), calc(-1 * var(--45degUnit) * var(--distButtons)));
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.buttons .workoutButton.clicked {
+    transform: translate(0, calc(-1 * var(--distButtons)));
+    opacity: 1;
+    pointer-events: auto;
+}
+.buttons .weightButton.clicked {
+    transform: translate(calc(var(--45degUnit) * var(--distButtons)), calc(-1 * var(--45degUnit) * var(--distButtons)));
+    opacity: 1;
+    pointer-events: auto;
 }

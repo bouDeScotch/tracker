@@ -92,13 +92,16 @@
         </ul>
     </div>
 
-    <div class="roundButton addButton">
+    <div class="buttons">
+        <div class="roundButton addButton"></div>
         <a href="">
-            <div class="roundButton"></div>
-        </a><a href="">
-            <div class="roundButton"></div>
-        </a><a href="">
-            <div class="roundButton"></div>
+            <div class="roundButton mealButton"></div>
+        </a>
+        <a href="">
+            <div class="roundButton workoutButton"></div>
+        </a>
+        <a href="">
+            <div class="roundButton weightButton"></div>
         </a>
     </div>
 
@@ -182,5 +185,7 @@
             inner.style.width = clampedProgress + "%";
         });
     </script>
+
+    <script src="/tracker/public/assets/addButton.js"></script>
 </body>
 </html>
