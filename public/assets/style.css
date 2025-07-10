@@ -145,3 +145,22 @@ header a.settingsLink {
     font-size: 0.9em;
     color: var(--lighterColor);
 }
+
+.actionCard button {
+    background-size: cover;
+    background-repeat: no-repeat;
+    height: 2em;
+    background-color: transparent;
+    box-shadow: none;
+    border: none;
+}
+
+.editButton {
+    background-image: url('./images/editIcon.png');
+    aspect-ratio: 512 / 491;
+}
+
+.deleteButton {
+    background-image: url('./images/binIcon.png');
+    aspect-ratio: 1 / 1;
+}
