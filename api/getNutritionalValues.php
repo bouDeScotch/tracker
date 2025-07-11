@@ -3,35 +3,12 @@ header('Content-Type: application/json');
 // This function retrieves nutritional values for a given food item
 
 function findFood($foodName, $data) {
-    if (isset($data[$foodName])) {
-        return $data[$foodName];
+    $aliasesMap = json_decode(file_get_contents('data/globalAliases.json'), true);
+    $foodName = strtolower(trim($foodName));
+    if (isset($aliasesMap[$foodName])) {
+        $foodName = $aliasesMap[$foodName];
     }
-
-    // Check if alias exists before searching it in the data
-    $exists = false;
-    $aliases = json_decode(file_get_contents('data/globalAliases.json'), true);
-    foreach ($aliases as $alias) {
-        if (isset($data[$alias]) && $data[$alias]['name'] === $foodName) {
-            $exists = true;
-            break;
-        }
-    }
-    if (!$exists) {
-        return null;
-    }
-
-    // We know the alias exists so now we can search for it in the data
-    foreach ($data as $key => $value) {
-        foreach ($value["aliases"] as $alias) {
-            if ($alias === $foodName) {
-                return $value;
-            }
-        }
-    }
-
-    // This should never happen as we already checked if the alias exists
-    // but we return null just in case
-    return null;
+    return isset($data[$foodName]) ? $data[$foodName] : null;
 }
 
 function getNutritionalValues($foodItem, $unit = "grams") {

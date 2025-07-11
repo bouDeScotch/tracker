@@ -1,5 +1,5 @@
-[
-    "white rice",
-    "cooked rice",
-    "rice"
-]
+{
+    "white rice": "rice",
+    "cooked rice": "rice",
+    "rice": "rice"
+}
