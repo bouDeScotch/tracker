@@ -122,9 +122,14 @@ header a.settingsLink {
     overflow: hidden;
 }
 
-#weightChart {
+#graphContainer {
     max-height: 20vh;
+    width: 100%;
+    max-width: 400px;
     margin: 0 auto;
+}
+
+#weightChart {
     border-radius: 8px;
     border: solid 1px var(--lighterColor);
 }

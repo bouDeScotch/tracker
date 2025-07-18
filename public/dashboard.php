@@ -1,9 +1,15 @@
+<?php
+session_name('tracker_session');
+session_start();
+$_SESSION['username'] = 'John Doe'; // Example username, replace with actual session data
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/tracker/public/assets/style.css">
+    <link rel="stylesheet" href="assets/style.css">
     <title>Macros tracker</title>
 </head>
 <body>
@@ -12,9 +18,6 @@
             <h1>Tracker</h1>
             <h2>Bonjour, <span class="username">
                 <?php
-                session_name('tracker_session');
-                session_start();
-                $_SESSION['username'] = 'John Doe'; // Example username, replace with actual session data
                 echo htmlspecialchars($_SESSION['username']); 
                 ?>
             </span></h2>
@@ -38,7 +41,9 @@
             </li>
             <li class="card array">
                 <h3>Mass : 71.0 kg</h3>
-                <canvas id="weightChart" width="300" height="200"></canvas>
+                <div id="graphContainer">
+                    <canvas id="weightChart"></canvas>
+                </div>
             </li>
         </ul>
     </div>
@@ -111,7 +116,7 @@
     <script>
     const ctx = document.getElementById('weightChart').getContext('2d');
 
-    fetch('/tracker/api/getWeight.php')
+    fetch('/public/..   /api/getWeight.php')
     .then(res => res.json())
     .then(data => {
         const chart = new Chart(ctx, {
@@ -133,6 +138,7 @@
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             plugins: {
                 legend: {display: false},
             },
@@ -186,6 +192,6 @@
         });
     </script>
 
-    <script src="/tracker/public/assets/addButton.js"></script>
+    <script src="assets/addButton.js"></script>
 </body>
 </html>
