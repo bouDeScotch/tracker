@@ -23,7 +23,7 @@ $_SESSION['username'] = 'John Doe'; // Example username, replace with actual ses
             </span></h2>
         </div>
         <a href="settings.php" class="settingsLink">
-            <div class="settingsButton">
+            <div class="darkButton">
                 Settings
             </div>
         </a>
