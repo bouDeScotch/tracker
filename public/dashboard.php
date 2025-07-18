@@ -116,7 +116,7 @@ $_SESSION['username'] = 'John Doe'; // Example username, replace with actual ses
     <script>
     const ctx = document.getElementById('weightChart').getContext('2d');
 
-    fetch('/public/..   /api/getWeight.php')
+    fetch('../api/getWeight.php')
     .then(res => res.json())
     .then(data => {
         const chart = new Chart(ctx, {

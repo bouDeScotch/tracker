@@ -11,11 +11,16 @@ function findFood($foodName, $data) {
     return isset($data[$foodName]) ? $data[$foodName] : null;
 }
 
+function findFoodTrueName($foodName) {
+    $aliasesData = json_decode(file_get_contents('../data/globalAliases.json'), true);
+    return isset($aliasesData[$foodName]) ? $aliasesData[$foodName] : null;
+} 
+
 function getNutritionalValues($foodItem, $unit = "grams") {
     $data = json_decode(file_get_contents('../data/foodMacros.json'), true);
     $foodItem = strtolower(trim($foodItem));
     $foodItem = findFood($foodItem, $data);
-    return $foodItem ? $foodItem['macros'] : null;
+    return isset($foodItem[$unit]) ? $foodItem[$unit] : null;
 }
 
 function getNutritionalValuesByAI($foodItem, $unit = "grams") {
@@ -29,15 +34,30 @@ You will receive a JSON object describing a food item with the following keys:
 - values_requested: list of nutrition values to return (e.g. kcal, prot, carbs, fats)
 
 Your task:
-- Return a JSON object containing:
-  - meal_name (same as input)
-  - quantity set to 100 if unit is grams, or 1 if unit is ounces (standard reference amount)
-  - unit (same as input)
-  - the requested nutrition values, per standard unit (e.g. per 100g or per 1 oz)
-- Use typical nutrition values from standard food databases (e.g. USDA or CIQUAL)
-- Do not calculate based on any quantity, just provide typical values per unit
-- Round all numeric values to 1 decimal place
-- Include only the requested fields
+    - Return a JSON object containing:
+    - meal_name (same as input)
+    - quantity set to 100 if unit is grams, or 1 if unit is ounces (standard reference amount)
+    - unit (same as input)
+    - the requested nutrition values, per standard unit (e.g. per 100g or per 1 oz)
+    - if the unit is "serving", give the value for a typical serving
+    - Use typical nutrition values from standard food databases (e.g. USDA or CIQUAL)
+    - Do not calculate based on any quantity, just provide typical values per unit
+    - Round all numeric values to 1 decimal place
+    - Include only the requested fields
+    - Do not put anything before or after the {}, as it will be parsed directly
+
+
+Expected output :
+{
+    "meal_name": "name",
+    "quantity": 100, // or 1 if the unit is neither grams or mL
+    "unit": "grams", // will usualy be grams, oz, mL or serving, this is given in the input below
+    "kcal": 300, // values next including this one are only used as an example, do not copy them
+    "prot": 10,
+    "carbs": 0.3,
+    "fats": 6.5
+}
+
 
 Input :
 {
@@ -86,7 +106,7 @@ EOT;
         return json_encode([
             "error" => "cURL error: " . curl_error($ch)
         ]);
-    } 
+    }
 
     curl_close($ch);
     $responseData = json_decode($response, true);
@@ -103,7 +123,10 @@ EOT;
                 if (json_last_error() === JSON_ERROR_NONE) {
                     return $parsed;
                 } else {
-                    return ["error" => "Erreur lors du parse JSON: " . json_last_error_msg()];
+                    return [
+                        "error" => "Erreur lors du parse JSON: " . json_last_error_msg(),
+                        "message" => $jsonString
+                    ];
                 }
             }
         }
@@ -112,40 +135,86 @@ EOT;
 
 }
 
-function addNutritionalValues($foodItem, $unit, $values) {
-    $data = json_decode(file_get_contents('data/foodMacros.json'), true);
-    $alias = $foodItem;
-    $foodItem = strtolower(trim($foodItem));
-    $newItem = [
-        "aliases" => [$alias],
-        $unit => $values,
+function addNutritionalValues($foodItem, $values) {
+    // Two possibilities : the item exists, but not with this unit
+    // The item doesn't exists at all
+
+    define("LIST_VALUES", [
+        "kcal", "prot", "carbs", "fats"
+    ]);
+
+    $data = file_get_contents('../data/foodMacros.json');
+    $data = json_decode($data, true);
+
+    $foodName = strtolower(trim($foodItem));
+    $trueName = findFoodTrueName($foodName);
+    if (! $trueName) {
+        $trueName = $foodName;
+        $item = [
+            "aliases" => []
+        ];
+        $data[$trueName] = $item;
+    }
+
+    $item =& $data[$trueName];
+    $unit = $values["unit"];
+
+    $item[$unit] = [
+        "per" => $values["quantity"]
     ];
-    $data[$foodItem] = $newItem;
-    file_put_contents('data/foodMacros.json', json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 
-    // Also update the global aliases
-    $globalAliases = json_decode(file_get_contents('data/globalAliases.json'), true);
-    $globalAliases[$alias] = $foodItem;
-    file_put_contents('data/globalAliases.json', json_encode($globalAliases, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+    foreach(LIST_VALUES as $nutritionalValueIndex) {
+        $item[$unit][$nutritionalValueIndex] = $values[$nutritionalValueIndex];
+    }
 
-    return $newItem;
+    // Save in data
+    $bytesWritten = file_put_contents('../data/foodMacros.json', json_encode($data));
+    if (! $bytesWritten) {
+        return [
+            "error" => "The item couldn't be written in foodMacros.json"
+        ];
+    }
+
+    // Add the alias the the globalAliases file for later
+    $aliasesData = json_decode(file_get_contents('../data/globalAliases.json'), true);
+    $aliasesData[$foodName] = $trueName;
+    $bytesWritten = file_put_contents('../data/globalAliases.json', json_encode($aliasesData));
+    if (! $bytesWritten) {
+        return [
+            "error" => "The item couldn't be written in globalAliases.json"
+        ];
+    }
+
+    return 1;
 }
 
 
 // Check if the food item is provided
 if (isset($_GET['food'])) {
     $foodItem = $_GET['food'];
+    $foodItem = strtolower(trim($foodItem));
     $unit = isset($_GET['unit']) ? $_GET['unit'] : "grams";
     $nutritionalValues = getNutritionalValues($foodItem, $unit);
     if ($nutritionalValues) {
+        $nutritionalValues["meal_name"] = findFoodTrueName($foodItem);
+        $nutritionalValues["unit"] = $unit;
+        $nutritionalValues["metadata"] = [
+            "from" => "database"
+        ];
         echo json_encode($nutritionalValues);
     } else {
         $nutritionalValues = getNutritionalValuesByAI($foodItem, $unit);
         if ($nutritionalValues) {
-            // addNutritionalValues($foodItem, $unit, $nutritionalValues);
+            $addResult = addNutritionalValues($foodItem,$nutritionalValues);
+            if ($addResult !== 1) {
+                echo $addResult;
+            }
+            $nutritionalValues["metadata"] = [
+            "from" => "AI"
+            ];
             echo json_encode($nutritionalValues);
         } else {
-            echo json_encode(["error" => "Food item not found"]);
+            echo json_encode($nutritionalValues);
         }
     }
 } else {

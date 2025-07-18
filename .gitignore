@@ -1,2 +1,4 @@
 .structure
 data/APIKeys.json
+data/foodMacros.json
+data/globalAliases.json
