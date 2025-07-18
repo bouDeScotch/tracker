@@ -5,7 +5,7 @@ session_start();
 require_once __DIR__ . '/../lib/helpers.php';
 
 // Before asking anything, instantly redirect to dashboard if already connected
-if (isset($_SESSION["connected"]) ? $_SESSION["connected"] : false) {
+if (isset($_SESSION["email"])) {
     header("Location: dashboard.php");
     exit;
 }
@@ -39,6 +39,8 @@ function handlePostRequest(): bool|string {
         'created_at' => date('c')
     ];
     
+    $_SESSION['email'] = $email;
+
     return saveJSONFile(__DIR__ . '/../data/users.json', $usersData);
 }
 
@@ -50,6 +52,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($result === true) {
         $success = true;
+        header("Location: profile.php");
+        exit;
     } else {
         $error = $result;
     }
