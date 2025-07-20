@@ -5,7 +5,7 @@ session_start();
 require_once __DIR__ . '/../lib/helpers.php';
 
 // Before asking anything, instantly redirect to dashboard if already connected
-if (isset($_SESSION["email"])) {
+if (isset($_SESSION["user_id"])) {
     header("Location: dashboard.php");
     exit;
 }
@@ -36,7 +36,8 @@ function handlePostRequest(): bool|string {
     $usersData[] = [
         'email' => $email,
         'password' => $hashedPwd,
-        'created_at' => date('c')
+        'created_at' => date('c'),
+        'id' => count($usersData) + 1 // Simple ID generation
     ];
     
     $_SESSION['email'] = $email;
@@ -51,6 +52,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $result = handlePostRequest();
 
     if ($result === true) {
+        // The result is true, we can login the user without needing to ask for credentials again
+        $payload = [
+            'id' => $user['id'],
+            'email' => $user['email'],
+            'exp' => time() + 3600 // expire dans 1h
+        ];
+        $jwt = generateJWT($payload);
+
+        setcookie('auth_token', $jwt, time() + 3600, '/', '', false, true);
+
         $success = true;
         header("Location: profile.php");
         exit;
