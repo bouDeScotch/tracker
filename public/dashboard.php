@@ -2,12 +2,18 @@
 session_name('tracker_session');
 session_start();
 
-if (! isset($_SESSION['id'])) {
+if (! isset($_SESSION['user_id'])) {
+    //echo('Session user_id not set, redirecting to register.php');
     header('Location: register.php');
     exit();
 }
 
 require_once __DIR__ . '/../lib/getUserInfo.php';
+if (!isset($_SESSION['email'])) {
+    //error_log('Session email not set, redirecting to register.php');
+    header('Location: register.php');
+    exit();
+}
 $user = getUserInfo($_SESSION['email']);
 ?>
 

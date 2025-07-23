@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         $now = new DateTime();
         $age = $now->diff($birthDateDateTime)->y;
-        if ($age <= 10 && $age >= 120) {
+        if ($age <= 10 || $age >= 120) {
             $error .= 'Error : The birth date entered makes you below 10 or above 120 years old. </br>';
         } else {
             $usersData[$currentUserKey]["birthdate"] = $birthdate;

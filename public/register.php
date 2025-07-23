@@ -2,7 +2,7 @@
 session_name('tracker_session');
 session_start();
 
-require_once __DIR__ . '/../lib/helpers.php';
+require_once __DIR__ . '/../init.php';
 
 // Before asking anything, instantly redirect to dashboard if already connected
 if (isset($_SESSION["user_id"])) {
@@ -10,64 +10,69 @@ if (isset($_SESSION["user_id"])) {
     exit;
 }
 
-function handlePostRequest(): bool|string {
+function handlePostRequest(): array|string {
     if (! isset($_POST['email'])) {
-        return 'Error : email is not set';
+        return ["error" => "Email is not set"];
     }
     $email = trim($_POST['email']);
 
     if (! isset($_POST['password'])) {
-        return 'Error : password is not set';
+        return ["error" => "Password is not set"];
     }
     $password = $_POST['password'];
 
     if (! filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        return 'Error : email is not valid';
+        return ["error" => "Invalid email format"];
     }
 
     $usersData = loadJSONFile(__DIR__ . '/../data/users.json');
     foreach ($usersData as $user) {
         if ($user['email'] === $email) {
-            return 'Error : this email is already used';
+            return ["error" => "Email already exists"];
         }
     }
 
     $hashedPwd = password_hash($password, PASSWORD_DEFAULT);
-    $usersData[] = [
+    $newUser = [
         'email' => $email,
         'password' => $hashedPwd,
         'created_at' => date('c'),
         'id' => count($usersData) + 1 // Simple ID generation
     ];
+    $usersData[] = $newUser;
     
     $_SESSION['email'] = $email;
+    $_SESSION['user_id'] = $newUser['id'];
 
-    return saveJSONFile(__DIR__ . '/../data/users.json', $usersData);
+    $payload = [
+        'id' => $newUser['id'],
+        'email' => $newUser['email'],
+        'exp' => time() + 3600 // expire dans 1h
+    ];
+    $jwt = generateJWT($payload);
+
+    setcookie('auth_token', $jwt, time() + 3600, '/', '', false, true);
+
+    if (saveJSONFile(__DIR__ . '/../data/users.json', $usersData)) {
+        return $newUser;
+    } else {
+        return ["error" => "Failed to save user data"];
+    }
 }
 
+
 $error = false;
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Here we handle the case where the form is posted
     $result = handlePostRequest();
-
-    if ($result === true) {
-        // The result is true, we can login the user without needing to ask for credentials again
-        $payload = [
-            'id' => $user['id'],
-            'email' => $user['email'],
-            'exp' => time() + 3600 // expire dans 1h
-        ];
-        $jwt = generateJWT($payload);
-
-        setcookie('auth_token', $jwt, time() + 3600, '/', '', false, true);
-
-        $success = true;
+    if (!isset($result['error'])) {
         header("Location: profile.php");
         exit;
-    } else {
-        $error = $result;
     }
+    $error = $result['error'];
+} else {
+    // If not a POST request, just show the registration form
+    $error = "";
+    $success = false;
 }
 ?>
 

@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-$data = json_decode(file_get_contents('php://input'), true);
+$data = loadJSONFile('php://input');
 
 if (!isset($data['email']) || !isset($data['password'])) {
     http_response_code(400);
@@ -40,7 +40,11 @@ if (!password_verify($password, $userInfo['password'])) {
     exit;
 }
 
-$jwt = generateJWT($email);
+$jwt = generateJWT([
+    'id' => $userInfo['id'],
+    'email' => $email,
+    'exp' => time() + 3600
+]);
 if ($jwt === false) {
     http_response_code(500);
     echo json_encode(['error' => 'Failed to generate JWT']);
