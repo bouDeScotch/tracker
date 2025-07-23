@@ -1,9 +1,10 @@
 <?php
+require_once __DIR__ . '/../init.php';
 header('Content-Type: application/json');
 // This function retrieves nutritional values for a given food item
 
 function findFood($foodName, $data) {
-    $aliasesMap = json_decode(file_get_contents('../data/globalAliases.json'), true);
+    $aliasesMap = loadJSONFile('../data/globalAliases.json');
     $foodName = strtolower(trim($foodName));
     if (isset($aliasesMap[$foodName])) {
         $foodName = $aliasesMap[$foodName];
@@ -12,19 +13,19 @@ function findFood($foodName, $data) {
 }
 
 function findFoodTrueName($foodName) {
-    $aliasesData = json_decode(file_get_contents('../data/globalAliases.json'), true);
+    $aliasesData = loadJSONFile('../data/globalAliases.json');
     return isset($aliasesData[$foodName]) ? $aliasesData[$foodName] : null;
 } 
 
 function getNutritionalValues($foodItem, $unit = "grams") {
-    $data = json_decode(file_get_contents('../data/foodMacros.json'), true);
+    $data = loadJSONFile('../data/foodMacros.json');
     $foodItem = strtolower(trim($foodItem));
     $foodItem = findFood($foodItem, $data);
     return isset($foodItem[$unit]) ? $foodItem[$unit] : null;
 }
 
 function getNutritionalValuesByAI($foodItem, $unit = "grams") {
-    $apiKey = json_decode(file_get_contents('../data/APIKeys.json'), true)['openai'];
+    $apiKey = loadJSONFile('../data/APIKeys.json')['openai'];
     $url = 'https://api.openai.com/v1/responses';
 
     $text = <<<EOT
@@ -176,7 +177,7 @@ function addNutritionalValues($foodItem, $values) {
     }
 
     // Add the alias the the globalAliases file for later
-    $aliasesData = json_decode(file_get_contents('../data/globalAliases.json'), true);
+    $aliasesData = loadJSONFile('../data/globalAliases.json');
     $aliasesData[$foodName] = $trueName;
     $bytesWritten = file_put_contents('../data/globalAliases.json', json_encode($aliasesData));
     if (! $bytesWritten) {
@@ -190,33 +191,53 @@ function addNutritionalValues($foodItem, $values) {
 
 
 // Check if the food item is provided
-if (isset($_GET['food'])) {
-    $foodItem = $_GET['food'];
-    $foodItem = strtolower(trim($foodItem));
-    $unit = isset($_GET['unit']) ? $_GET['unit'] : "grams";
-    $nutritionalValues = getNutritionalValues($foodItem, $unit);
-    if ($nutritionalValues) {
-        $nutritionalValues["meal_name"] = findFoodTrueName($foodItem);
-        $nutritionalValues["unit"] = $unit;
-        $nutritionalValues["metadata"] = [
-            "from" => "database"
-        ];
-        echo json_encode($nutritionalValues);
-    } else {
-        $nutritionalValues = getNutritionalValuesByAI($foodItem, $unit);
-        if ($nutritionalValues) {
-            $addResult = addNutritionalValues($foodItem,$nutritionalValues);
-            if ($addResult !== 1) {
-                echo $addResult;
-            }
-            $nutritionalValues["metadata"] = [
-            "from" => "AI"
-            ];
-            echo json_encode($nutritionalValues);
-        } else {
-            echo json_encode($nutritionalValues);
-        }
-    }
-} else {
+if (!isset($_GET['food'])) {
     echo json_encode(["error" => "No food item provided"]);
+    exit();
 }
+
+$authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+if (preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
+    $jwt = $matches[1];
+} else {
+    echo json_encode(["error" => "Authorization header not found"]);
+    exit();
+}
+
+$jwtPayload = decodeJWT($jwt);
+if (isset($jwtPayload['error'])) {
+    http_response_code(401);
+    echo json_encode($jwtPayload);
+    exit();
+}
+
+$foodItem = $_GET['food'];
+$foodItem = strtolower(trim($foodItem));
+$unit = isset($_GET['unit']) ? $_GET['unit'] : "grams";
+$nutritionalValues = getNutritionalValues($foodItem, $unit);
+if ($nutritionalValues) {
+    $nutritionalValues["meal_name"] = findFoodTrueName($foodItem);
+    $nutritionalValues["unit"] = $unit;
+    $nutritionalValues["metadata"] = [
+        "from" => "database"
+    ];
+    echo json_encode($nutritionalValues);
+    exit();
+}
+
+$nutritionalValues = getNutritionalValuesByAI($foodItem, $unit);
+if ($nutritionalValues) {
+    $addResult = addNutritionalValues($foodItem, $nutritionalValues);
+    if ($addResult !== 1) {
+        echo $addResult;
+        exit();
+    }
+    $nutritionalValues["metadata"] = [
+        "from" => "AI"
+    ];
+    echo json_encode($nutritionalValues);
+    exit();
+}
+
+echo json_encode($nutritionalValues);
+exit();

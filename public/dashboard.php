@@ -1,7 +1,20 @@
 <?php
 session_name('tracker_session');
 session_start();
-$_SESSION['username'] = 'John Doe'; // Example username, replace with actual session data
+
+if (! isset($_SESSION['user_id'])) {
+    //echo('Session user_id not set, redirecting to register.php');
+    header('Location: register.php');
+    exit();
+}
+
+require_once __DIR__ . '/../lib/getUserInfo.php';
+if (!isset($_SESSION['email'])) {
+    //error_log('Session email not set, redirecting to register.php');
+    header('Location: register.php');
+    exit();
+}
+$user = getUserInfo($_SESSION['email']);
 ?>
 
 <!DOCTYPE html>
@@ -18,12 +31,13 @@ $_SESSION['username'] = 'John Doe'; // Example username, replace with actual ses
             <h1>Tracker</h1>
             <h2>Bonjour, <span class="username">
                 <?php
-                echo htmlspecialchars($_SESSION['username']); 
+                $username = $user['firstname'] . " " . $user['lastname'];
+                echo htmlspecialchars($username);
                 ?>
             </span></h2>
         </div>
-        <a href="settings.php" class="settingsLink">
-            <div class="settingsButton">
+        <a href="profile.php" class="settingsLink">
+            <div class="darkButton">
                 Settings
             </div>
         </a>
