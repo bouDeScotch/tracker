@@ -190,33 +190,53 @@ function addNutritionalValues($foodItem, $values) {
 
 
 // Check if the food item is provided
-if (isset($_GET['food'])) {
-    $foodItem = $_GET['food'];
-    $foodItem = strtolower(trim($foodItem));
-    $unit = isset($_GET['unit']) ? $_GET['unit'] : "grams";
-    $nutritionalValues = getNutritionalValues($foodItem, $unit);
-    if ($nutritionalValues) {
-        $nutritionalValues["meal_name"] = findFoodTrueName($foodItem);
-        $nutritionalValues["unit"] = $unit;
-        $nutritionalValues["metadata"] = [
-            "from" => "database"
-        ];
-        echo json_encode($nutritionalValues);
-    } else {
-        $nutritionalValues = getNutritionalValuesByAI($foodItem, $unit);
-        if ($nutritionalValues) {
-            $addResult = addNutritionalValues($foodItem,$nutritionalValues);
-            if ($addResult !== 1) {
-                echo $addResult;
-            }
-            $nutritionalValues["metadata"] = [
-            "from" => "AI"
-            ];
-            echo json_encode($nutritionalValues);
-        } else {
-            echo json_encode($nutritionalValues);
-        }
-    }
-} else {
+if (!isset($_GET['food'])) {
     echo json_encode(["error" => "No food item provided"]);
+    exit();
 }
+
+$authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+if (preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
+    $jwt = $matches[1];
+} else {
+    echo json_encode(["error" => "Authorization header not found"]);
+    exit();
+}
+
+$jwtPayload = decodeJWT($jwt);
+if (isset($jwtPayload['error'])) {
+    http_response_code(401);
+    echo json_encode($jwtPayload);
+    exit();
+}
+
+$foodItem = $_GET['food'];
+$foodItem = strtolower(trim($foodItem));
+$unit = isset($_GET['unit']) ? $_GET['unit'] : "grams";
+$nutritionalValues = getNutritionalValues($foodItem, $unit);
+if ($nutritionalValues) {
+    $nutritionalValues["meal_name"] = findFoodTrueName($foodItem);
+    $nutritionalValues["unit"] = $unit;
+    $nutritionalValues["metadata"] = [
+        "from" => "database"
+    ];
+    echo json_encode($nutritionalValues);
+    exit();
+}
+
+$nutritionalValues = getNutritionalValuesByAI($foodItem, $unit);
+if ($nutritionalValues) {
+    $addResult = addNutritionalValues($foodItem, $nutritionalValues);
+    if ($addResult !== 1) {
+        echo $addResult;
+        exit();
+    }
+    $nutritionalValues["metadata"] = [
+        "from" => "AI"
+    ];
+    echo json_encode($nutritionalValues);
+    exit();
+}
+
+echo json_encode($nutritionalValues);
+exit();
