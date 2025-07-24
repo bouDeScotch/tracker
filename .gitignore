@@ -6,3 +6,4 @@ data/weights.json
 data/users.json
 
 .vscode
+config.php
