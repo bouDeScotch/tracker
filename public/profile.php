@@ -7,25 +7,17 @@ if (!isset($_SESSION["email"])) {
     exit;
 }
 
-require_once __DIR__ . '/../lib/helpers.php';
+require_once __DIR__ . '/../init.php';
 
-$usersData = loadJSONFile(__DIR__ . '/../data/users.json');
+$usersData = loadJSONFile(DATA_PATH . '/users.json');
 $email = $_SESSION['email'];
-$currentUser = null;
-$currentUserKey = null;
+$currentUser = getUserInfo($email);
 
-foreach ($usersData as $key => $user) {
-    if ($user['email'] === $email) {
-        $currentUser = $user;
-        $currentUserKey = $key;
-        break;
-    }
-}
-
-if (!$currentUser) {
+if ($currentUser === null) {
     // Should never happen
     exit('User not found. ' . $_SESSION['email']);
 }
+$currentUserKey = $currentUser['id'] - 1;
 
 $error = '';
 $success = false;

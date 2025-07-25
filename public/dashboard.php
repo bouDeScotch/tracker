@@ -1,6 +1,7 @@
 <?php
 session_name('tracker_session');
 session_start();
+error_log('Session ID: ' . session_id());
 
 if (! isset($_SESSION['user_id'])) {
     //echo('Session user_id not set, redirecting to register.php');
@@ -14,6 +15,7 @@ if (!isset($_SESSION['email'])) {
     header('Location: register.php');
     exit();
 }
+
 $user = getUserInfo($_SESSION['email']);
 ?>
 

@@ -1,12 +1,14 @@
 <?php
 session_name('tracker_session');
 session_start();
+error_log('Session ID: ' . session_id());
 
 require_once __DIR__ . '/../init.php';
 
 // Before asking anything, instantly redirect to dashboard if already connected
 if (isset($_SESSION["user_id"])) {
-    header("Location: dashboard.php");
+    echo("Deja connecté");
+    echo($_SESSION["user_id"]);
     exit;
 }
 

@@ -1,7 +1,20 @@
 <?php
 session_name('tracker_session');
 session_start();
-$_SESSION['username'] = 'John Doe'; // Example username, replace with actual session data
+
+// Checking if user connected, if not redirect him to login
+if (!isset($_SESSION['user_id'])) {
+    header('Location: login.php');
+    exit;
+}
+
+require_once __DIR__ . '../init.php';
+$userInfo = getUserInfo($_SESSION['email']);
+if ($userInfo === null) {
+    header('Location: login.php');
+    exit;
+}
+$_SESSION['username'] = $userInfo["firstname"] . " " . $userInfo["lastname"];
 ?>
 
 <!DOCTYPE html>

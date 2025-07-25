@@ -1,6 +1,10 @@
 <?php
 require_once __DIR__ . '/../init.php';
 
+session_name('tracker_session');
+session_start();
+
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $_POST['email'] ?? '';
     $password = $_POST['password'] ?? '';

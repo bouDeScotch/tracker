@@ -5,9 +5,6 @@ header('Content-Type: application/json');
 session_name('tracker_session');
 session_start();
 
-// TODO : REMOVE THIS, HERE FOR TESTING !!!
-$_SESSION['email'] = "test@example.com";
-
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
   echo json_encode(["error" => "This API endpoint should be used with a GET request."]);
   exit();
