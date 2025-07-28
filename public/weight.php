@@ -8,7 +8,7 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-require_once __DIR__ . '../init.php';
+require_once __DIR__ . '/../init.php';
 $userInfo = getUserInfo($_SESSION['email']);
 if ($userInfo === null) {
     header('Location: login.php');
@@ -26,20 +26,37 @@ $_SESSION['username'] = $userInfo["firstname"] . " " . $userInfo["lastname"];
     <title>Macros tracker</title>
 </head>
 <body>
-    <header>
-        <div class="texts">
-            <h1>Tracker</h1>
-            <h2>Bonjour, <span class="username">
-                <?php
-                echo htmlspecialchars($_SESSION['username']); 
-                ?>
-            </span></h2>
-        </div>
-        <a href="settings.php" class="settingsLink">
-            <div class="settingsButton">
-                Settings
+    <?php include "./header.php" ?>
+    <div class="weight-tracker-page">
+        <form action="../api/log_weight.php" method="POST">
+            <div class="form-group">
+                <label for="date">Date</label>
+                <input type="date" value="<?php echo date('Y-m-d'); ?>" id="date" name="date" required/>
             </div>
-        </a>
-    </header>
+            <div class="form-group">
+                <label for="weight">Weight (kg)</label>
+                <input type="number" step=0.1 id="weight" name="weight" required />
+            </div>
+            <div class="form-group">
+                <label for="note">Note (optional)</label>
+                <textarea id="note" name="note" rows="2"></textarea> 
+            </div>
+            <button type="submit" class="btn">Ajouter</button> 
+        </form>
+        <div class="weight-graph">
+            <div id="graphContainer">
+                <canvas id="weightChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+
+    <!-- Chart.js script -->
+    <script src="./assets/js/weightChart.js"> </script>
+    <script>
+        loadWeightChart('weightChart', '../api/getWeight.php');
+    </script>
 </body>
 </html>

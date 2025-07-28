@@ -51,10 +51,7 @@ $weightData[$email][] = [
 
 $response = saveJSONFile(__DIR__ . "/../data/weights.json", $weightData);
 if ($response === true) {
-    echo json_encode([
-        "success" => true,
-        "data" => end($weightData[$email])
-    ]);
-    exit();
+    header('Location: ../public/weight.php');
+    exit();   
 }
 echo json_encode(["error" => "Could not save in weight.json file."]);

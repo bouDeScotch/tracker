@@ -9,7 +9,7 @@ if (! isset($_SESSION['user_id'])) {
     exit();
 }
 
-require_once __DIR__ . '/../lib/getUserInfo.php';
+require_once __DIR__ . '/../init.php';
 if (!isset($_SESSION['email'])) {
     //error_log('Session email not set, redirecting to register.php');
     header('Location: register.php');
@@ -28,22 +28,7 @@ $user = getUserInfo($_SESSION['email']);
     <title>Macros tracker</title>
 </head>
 <body>
-    <header>
-        <div class="texts">
-            <h1>Tracker</h1>
-            <h2>Bonjour, <span class="username">
-                <?php
-                $username = $user['firstname'] . " " . $user['lastname'];
-                echo htmlspecialchars($username);
-                ?>
-            </span></h2>
-        </div>
-        <a href="profile.php" class="settingsLink">
-            <div class="darkButton">
-                Settings
-            </div>
-        </a>
-    </header>
+    <?php include "./header.php" ?>
     <div class="summary">
         <h2>Summary</h2>
         <ul class="cardsList">
@@ -56,7 +41,14 @@ $user = getUserInfo($_SESSION['email']);
                 <div class="progressBar full" data-progress="125"></div>
             </li>
             <li class="card array">
-                <h3>Mass : 71.0 kg</h3>
+            <h3>Mass : <?php 
+            $response = loadJSONFile(DATA_PATH . "/weights.json");
+            if (!isset($response[$user["email"]])) {
+                echo "No data, <a href='./weights.php'>log a weight</a> before !";
+            } else {
+                echo end($response[$user["email"]])["weight"] . " kg";
+            }
+            ?></h3>
                 <div id="graphContainer">
                     <canvas id="weightChart"></canvas>
                 </div>
@@ -115,78 +107,27 @@ $user = getUserInfo($_SESSION['email']);
 
     <div class="buttons">
         <div class="roundButton addButton"></div>
-        <a href="/tracker/public/meals.php">
+        <a href="./meals.php">
             <div class="roundButton mealButton"></div>
         </a>
-        <a href="/tracker/public/workouts.php">
+        <a href="./workouts.php">
             <div class="roundButton workoutButton"></div>
         </a>
-        <a href="/tracker/public/weight.php">
+        <a href="./weight.php">
             <div class="roundButton weightButton"></div>
         </a>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
 
     <!-- Chart.js script -->
+    <script src="./assets/js/weightChart.js"> </script>
     <script>
-    const ctx = document.getElementById('weightChart').getContext('2d');
-
-    fetch('../api/getWeight.php')
-    .then(res => res.json())
-    .then(data => {
-        const chart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: data.dates,     // ["01/07", "02/07", ...]
-            datasets: [{
-                label: 'Poids (kg)',
-                data: data.weights,   // [72, 71.8, 71.5, ...]
-                borderColor: '#3FB839',
-                pointBackgroundColor: '#00000000',
-                pointBorderColor: '#3FB839',
-                borderWidth: 4,
-                pointBorderWidth: 4,
-                fill: false,
-                tension: 0.6,
-                pointRadius: 9
-                }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {display: false},
-            },
-            scales: {
-                y: {
-                    beginAtZero: false,
-                    grid: {
-                        display: false
-                    },
-                    ticks: {
-                        display: false
-                    },
-                    display: false
-                },
-                x: {
-                    grid: {
-                        display: false
-                    },
-                    ticks: {
-                        display: false
-                    },
-                    display: false
-                }
-            }
-        }
-        });
-    });
-
-
+        loadWeightChart('weightChart', '../api/getWeight.php');
     </script>
-
     <!-- Progress bars script -->
+                
     <script>
         document.querySelectorAll('.progressBar').forEach(bar => {
             const progress = parseFloat(bar.dataset.progress);
