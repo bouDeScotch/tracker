@@ -43,10 +43,12 @@ $weightData = loadJSONFile(__DIR__ . "/../data/weights.json");
 if (! isset($weightData[$email])) {
     $weightData[$email] = [];
 }
+$id = count($weightData[$email]);
 
 $weightData[$email][] = [
     "date" => $date,
-    "weight" => $weight
+    "weight" => $weight,
+    "id" => $id
 ];
 
 $response = saveJSONFile(__DIR__ . "/../data/weights.json", $weightData);

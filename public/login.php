@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($user['email'] === $email && password_verify($password, $user['password'])) {
             // Auth OK
             $_SESSION['user_id'] = $user['id'];
-
+            $_SESSION['email'] = $user['email'];
             // Génération du JWT
             $payload = [
                 'id' => $user['id'],

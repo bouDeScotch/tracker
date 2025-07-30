@@ -4,7 +4,7 @@
             <h1>Tracker</h1>
             <h2>Bonjour, <span class="username">
             <?php
-                if ($user) {
+                if (isset($user)) {
                     $username = $user['firstname'] . " " . $user['lastname'];
                     $_SESSION['username'] = $username;
                 } else {

@@ -243,3 +243,7 @@ a {
     opacity: 1;
     pointer-events: auto;
 }
+
+button:hover {
+    cursor: pointer;
+}

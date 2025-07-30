@@ -9,12 +9,19 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 require_once __DIR__ . '/../init.php';
-$userInfo = getUserInfo($_SESSION['email']);
+foreach ($_SESSION as $key => $value) {
+    error_log($key . " => " . $value);
+}
+$email = $_SESSION['email'];
+$userInfo = getUserInfo($email);
 if ($userInfo === null) {
     header('Location: login.php');
     exit;
 }
 $_SESSION['username'] = $userInfo["firstname"] . " " . $userInfo["lastname"];
+
+$entries = loadJSONFile(DATA_PATH . "/weights.json");
+$entries = isset($entries[$email]) ? $entries[$email] : [];
 ?>
 
 <!DOCTYPE html>
@@ -41,13 +48,36 @@ $_SESSION['username'] = $userInfo["firstname"] . " " . $userInfo["lastname"];
                 <label for="note">Note (optional)</label>
                 <textarea id="note" name="note" rows="2"></textarea> 
             </div>
-            <button type="submit" class="btn">Ajouter</button> 
+            <button type="submit" class="darkButton">Ajouter</button> 
         </form>
         <div class="weight-graph">
             <div id="graphContainer">
                 <canvas id="weightChart"></canvas>
             </div>
         </div>
+        <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Poids (kg)</th>
+                <th>Note</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="weight-table-body">
+                <?php foreach ($entries as $i => $entry): ?>
+                <tr data-id="<?= $entry['id'] ?? $i ?>">
+                    <td><?= $entry['date'] ?></td>
+                    <td><?= $entry['weight'] ?></td>
+                    <td><?= htmlspecialchars($entry['note']) ?></td>
+                    <td>
+                      <button class="darkButton">✏️</button>
+                      <button class="darkButton">🗑️</button>
+                    </td>
+                  </tr>
+                <?php endforeach; ?>
+            </tbody>
+      </table>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
