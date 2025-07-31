@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
   exit();
 }
 
-if (! isset($_SESSION['email'])) {
+if (! isset($_SESSION['user_id'])) {
   echo json_encode(["error" => "You should be logged in to call this API endpoint"]);
   exit();
 }

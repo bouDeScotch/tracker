@@ -1,6 +1,5 @@
 <?php
 
-require_once __DIR__ . '/../init.php';
 
 header('Content-Type: application/json');
 
@@ -18,37 +17,18 @@ if (!isset($data['email']) || !isset($data['password'])) {
     exit;
 }
 
-$email = filter_var($data['email'], FILTER_SANITIZE_EMAIL);
-if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+require_once __DIR__ . '/../src/AuthAPI.php';
+require_once __DIR__ . '/../init.php';
+
+try {
+    $jwt = AuthAPI::login($data["email"], $data["password"]);
+    echo json_encode(["jwt" => $jwt]);
+} catch (InvalidArgumentException $e) {
     http_response_code(400);
-    echo json_encode(['error' => 'Invalid email format']);
-    exit;
+    echo json_encode(['error' => $e->getMessage()]);
+} catch (RuntimeException $e) {
+    http_response_code($e->getCode() ?: 500);
+    echo json_encode(['error' => $e->getMessage()]);
 }
 
-$password = $data['password'];
-
-$userInfo = getUserInfo($email);
-if ($userInfo === null) {
-    http_response_code(404);
-    echo json_encode(['error' => 'User not found']);
-    exit;
-}
-
-if (!password_verify($password, $userInfo['password'])) {
-    http_response_code(401);
-    echo json_encode(['error' => 'Invalid password']);
-    exit;
-}
-
-$jwt = generateJWT([
-    'id' => $userInfo['id'],
-    'email' => $email,
-    'exp' => time() + 3600
-]);
-if ($jwt === false) {
-    http_response_code(500);
-    echo json_encode(['error' => 'Failed to generate JWT']);
-    exit;
-}
-echo json_encode(['jwt' => $jwt]);
 exit();

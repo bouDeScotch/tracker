@@ -10,7 +10,7 @@ class WeightAPI {
         }
 
         $weights = $weightsData[$email];
-        for ($i = 0; $i < count($weights); $i++) {
+        foreach ($weights as $i => $_) {
             if (! isset($weights[$i]['id'])) {
                 $weights[$i]['id'] = $i;
             } else {

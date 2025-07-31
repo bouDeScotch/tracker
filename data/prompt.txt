@@ -1,0 +1,38 @@
+You will receive a JSON object describing a food item with the following keys:
+- meal_name: the name of the food
+- unit: the unit of measurement (e.g. grams, ounces)
+- values_requested: list of nutrition values to return (e.g. kcal, prot, carbs, fats)
+
+Your task:
+    - Return a JSON object containing:
+    - meal_name (same as input)
+    - quantity set to 100 if unit is grams, or 1 if unit is ounces (standard reference amount)
+    - unit (same as input)
+    - the requested nutrition values, per standard unit (e.g. per 100g or per 1 oz)
+    - if the unit is "serving", give the value for a typical serving
+    - Use typical nutrition values from standard food databases (e.g. USDA or CIQUAL)
+    - Do not calculate based on any quantity, just provide typical values per unit
+    - Round all numeric values to 1 decimal place
+    - Include only the requested fields
+    - Do not put anything before or after the {}, as it will be parsed directly
+
+
+Expected output :
+{
+    "meal_name": "name",
+    "quantity": 100,
+    "unit": "grams",
+    "kcal": 300,
+    "prot": 10,
+    "carbs": 0.3,
+    "fats": 6.5
+}
+
+
+Input :
+{
+  "meal_name": "{{meal_name}}",
+  "unit": "{{unit}}",
+  "values_requested": ["kcal", "prot", "carbs", "fats"]
+}
+
