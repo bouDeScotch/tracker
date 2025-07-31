@@ -7,3 +7,5 @@ data/users.json
 
 .vscode
 config.php
+
+/vendor/

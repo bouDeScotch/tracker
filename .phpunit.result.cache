@@ -1,0 +1,1 @@
+{"version":1,"defects":[],"times":{"WeightApiTest::testNoWeightsForUser":0.001,"WeightApiTest::testWeightsReturnedCorrectly":0,"WeightApiTest::testLimitNumberOfWeights":0,"WeightApiTest::testLogWeightAddsNewEntry":0,"WeightApiTest::testLogWeightAppendsCorrectly":0,"WeightApiTest::testLogWeightRejectsInvalidWeight":0,"WeightApiTest::testLogWeightRejectsInvalidDate":0}}

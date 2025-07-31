@@ -35,7 +35,7 @@ $entries = isset($entries[$email]) ? $entries[$email] : [];
 <body>
     <?php include "./header.php" ?>
     <div class="weight-tracker-page">
-        <form action="../api/log_weight.php" method="POST">
+        <form action="../api/addWeight.php" method="POST">
             <div class="form-group">
                 <label for="date">Date</label>
                 <input type="date" value="<?php echo date('Y-m-d'); ?>" id="date" name="date" required/>
